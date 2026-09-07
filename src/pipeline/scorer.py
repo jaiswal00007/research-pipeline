@@ -32,8 +32,7 @@ class TopicScorer:
         )
         response = self.llm.chat(prompt, system=_SYSTEM)
         topic_score = _parse_scores(response)
-        status = "approved" if topic_score.total >= self.approval_threshold else "rejected"
-        return candidate.model_copy(update={"score": topic_score, "status": status})
+        return candidate.model_copy(update={"score": topic_score})
 
 
 def _parse_scores(text: str) -> TopicScore:

@@ -79,6 +79,13 @@ CREATE TABLE IF NOT EXISTS posts (
     created_at      TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS scripts (
+    id          INTEGER PRIMARY KEY,
+    topic_id    INTEGER REFERENCES topics(id),
+    content     TEXT NOT NULL,
+    created_at  TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS videos (
     id          INTEGER PRIMARY KEY,
     topic_id    INTEGER REFERENCES topics(id),
@@ -87,13 +94,6 @@ CREATE TABLE IF NOT EXISTS videos (
     script_id   INTEGER REFERENCES scripts(id),
     status      TEXT NOT NULL DEFAULT 'draft',
     published_at TEXT,
-    created_at  TEXT NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS scripts (
-    id          INTEGER PRIMARY KEY,
-    topic_id    INTEGER REFERENCES topics(id),
-    content     TEXT NOT NULL,
     created_at  TEXT NOT NULL
 );
 

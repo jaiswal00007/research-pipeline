@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Any, Literal
 from pydantic import BaseModel, computed_field
+from datetime import datetime, timezone
 
 
 SourceType = Literal["github", "hackernews", "reddit", "rss"]
@@ -56,3 +57,7 @@ class RepoInfo(BaseModel):
     readme_summary: str | None = None
     install_works: bool | None = None
     score: float | None = None
+
+
+def now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()

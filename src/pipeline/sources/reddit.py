@@ -1,13 +1,8 @@
 import os
-from datetime import datetime, timezone
 import httpx
-from pipeline.models import RawSource
+from pipeline.models import RawSource, now_iso
 
 _DEFAULT_SUBS = ["MachineLearning", "LocalLLaMA", "artificial", "singularity", "Programming"]
-
-
-def _now() -> str:
-    return datetime.now(timezone.utc).isoformat()
 
 
 def _user_agent() -> str:
@@ -38,7 +33,7 @@ def fetch_reddit_ai_posts(
                 url=post_url,
                 title=post.get("title", ""),
                 source_type="reddit",
-                fetched_at=_now(),
+                fetched_at=now_iso(),
                 raw=post,
             ))
     return results

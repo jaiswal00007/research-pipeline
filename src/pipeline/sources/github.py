@@ -1,7 +1,6 @@
 import os
-from datetime import datetime, timezone
 import httpx
-from pipeline.models import RawSource
+from pipeline.models import RawSource, now_iso
 
 _BASE = "https://api.github.com"
 _AI_QUERIES = [
@@ -20,10 +19,6 @@ def _headers(token: str | None) -> dict[str, str]:
     return h
 
 
-def _now() -> str:
-    return datetime.now(timezone.utc).isoformat()
-
-
 def search_github_ai(query: str, token: str | None = None) -> list[RawSource]:
     params = {"q": f"{query} language:Python stars:>50", "sort": "stars", "per_page": 10}
     resp = httpx.get(f"{_BASE}/search/repositories", params=params, headers=_headers(token), timeout=15)
@@ -34,7 +29,7 @@ def search_github_ai(query: str, token: str | None = None) -> list[RawSource]:
             url=item["html_url"],
             title=item["full_name"],
             source_type="github",
-            fetched_at=_now(),
+            fetched_at=now_iso(),
             raw=item,
         )
         for item in items

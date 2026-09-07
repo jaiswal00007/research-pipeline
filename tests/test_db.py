@@ -11,9 +11,8 @@ def test_init_creates_tables():
             "claims", "posts", "videos", "scripts", "hooks",
             "platform_metrics", "affiliate_links", "products", "conversions"} <= tables
 
-def test_get_db_returns_connection(tmp_path):
-    import os
-    os.environ["DB_PATH"] = str(tmp_path / "test.db")
+def test_get_db_returns_connection(tmp_path, monkeypatch):
+    monkeypatch.setenv("DB_PATH", str(tmp_path / "test.db"))
     conn = get_db()
     assert isinstance(conn, sqlite3.Connection)
     conn.close()

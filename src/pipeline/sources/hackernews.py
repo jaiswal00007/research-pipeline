@@ -1,13 +1,8 @@
-from datetime import datetime, timezone
 import httpx
-from pipeline.models import RawSource
+from pipeline.models import RawSource, now_iso
 
 _ALGOLIA = "https://hn.algolia.com/api/v1/search"
 _AI_TAGS = ["AI", "LLM", "machine learning", "open source AI", "coding agent"]
-
-
-def _now() -> str:
-    return datetime.now(timezone.utc).isoformat()
 
 
 def fetch_hn_ai_stories(min_points: int = 100) -> list[RawSource]:
@@ -30,7 +25,7 @@ def fetch_hn_ai_stories(min_points: int = 100) -> list[RawSource]:
             url=url,
             title=hit.get("title", ""),
             source_type="hackernews",
-            fetched_at=_now(),
+            fetched_at=now_iso(),
             raw=hit,
         ))
     return results

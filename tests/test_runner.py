@@ -31,6 +31,7 @@ def test_run_pipeline_saves_approved_topics(db):
         MockResearcher.return_value.summarise.return_value = _approved_candidate()
         MockValidator.return_value.verify_claim.return_value = _approved_candidate()
         MockScorer.return_value.score.return_value = _approved_candidate()
+        MockScorer.return_value.approval_threshold = 35
 
         results = run_pipeline(db_conn=db, llm=mock_llm)
 

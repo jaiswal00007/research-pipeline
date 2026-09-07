@@ -1,7 +1,6 @@
 # src/pipeline/runner.py
 import json
 import sys
-from datetime import datetime, timezone
 import sqlite3
 
 from dotenv import load_dotenv
@@ -10,15 +9,11 @@ from pipeline.db import get_db
 from pipeline.agents.ollama import OllamaClient
 from pipeline.agents.researcher import ResearchAgent
 from pipeline.agents.validator import ValidationAgent
-from pipeline.models import RawSource, TopicCandidate
+from pipeline.models import RawSource, TopicCandidate, now_iso
 from pipeline.scorer import TopicScorer
 from pipeline.sources.github import fetch_github_trending
 from pipeline.sources.hackernews import fetch_hn_ai_stories
 from pipeline.sources.reddit import fetch_reddit_ai_posts
-
-
-def _now() -> str:
-    return datetime.now(timezone.utc).isoformat()
 
 
 def _save_source(conn: sqlite3.Connection, source: RawSource) -> int:
@@ -28,6 +23,8 @@ def _save_source(conn: sqlite3.Connection, source: RawSource) -> int:
     )
     conn.commit()
     row = conn.execute("SELECT id FROM sources WHERE url=?", (source.url,)).fetchone()
+    if row is None:
+        raise RuntimeError(f"source missing after insert: {source.url}")
     return row["id"]
 
 
@@ -45,7 +42,7 @@ def _save_topic(conn: sqlite3.Connection, candidate: TopicCandidate, source_id: 
             s.usefulness if s else None, s.novelty if s else None,
             s.dev_value if s else None, s.search_demand if s else None,
             s.monetization if s else None, s.ease_demo if s else None,
-            candidate.status, _now(),
+            candidate.status, now_iso(),
         ),
     )
     conn.commit()
@@ -79,10 +76,11 @@ def run_pipeline(
             if candidate.status == "rejected":
                 continue
             candidate = scorer.score(candidate)
-            if candidate.status == "approved":
-                source_id = _save_source(conn, source)
-                _save_topic(conn, candidate, source_id)
-                approved.append(candidate)
+            if candidate.score is None or candidate.score.total < scorer.approval_threshold:
+                continue
+            source_id = _save_source(conn, source)
+            _save_topic(conn, candidate, source_id)
+            approved.append(candidate.model_copy(update={"status": "approved"}))
         except Exception as exc:
             print(f"  Warning: skipped {source.url}: {exc}", file=sys.stderr)
             continue

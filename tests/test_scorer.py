@@ -26,7 +26,7 @@ def test_scorer_populates_score():
     assert result.score.total == 43
 
 
-def test_scorer_marks_high_score_approved():
+def test_scorer_high_score_above_threshold():
     mock_llm = MagicMock()
     mock_llm.chat.return_value = (
         "USEFULNESS: 9\nNOVELTY: 9\nDEV_VALUE: 9\n"
@@ -34,10 +34,11 @@ def test_scorer_marks_high_score_approved():
     )
     scorer = TopicScorer(llm=mock_llm, approval_threshold=40)
     result = scorer.score(_make_candidate())
-    assert result.status == "approved"
+    assert result.score.total == 53
+    assert result.score.total >= 40
 
 
-def test_scorer_marks_low_score_rejected():
+def test_scorer_low_score_below_threshold():
     mock_llm = MagicMock()
     mock_llm.chat.return_value = (
         "USEFULNESS: 2\nNOVELTY: 2\nDEV_VALUE: 2\n"
@@ -45,4 +46,5 @@ def test_scorer_marks_low_score_rejected():
     )
     scorer = TopicScorer(llm=mock_llm, approval_threshold=40)
     result = scorer.score(_make_candidate())
-    assert result.status == "rejected"
+    assert result.score.total == 10
+    assert result.score.total < 40
