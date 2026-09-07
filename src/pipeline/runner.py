@@ -1,5 +1,5 @@
 # src/pipeline/runner.py
-import os
+import json
 import sys
 from datetime import datetime, timezone
 import sqlite3
@@ -22,7 +22,6 @@ def _now() -> str:
 
 
 def _save_source(conn: sqlite3.Connection, source: RawSource) -> int:
-    import json
     cur = conn.execute(
         "INSERT OR IGNORE INTO sources (name, url, source_type, fetched_at, raw_json) VALUES (?,?,?,?,?)",
         (source.title, source.url, source.source_type, source.fetched_at, json.dumps(source.raw)),
@@ -80,9 +79,9 @@ def run_pipeline(
             if candidate.status == "rejected":
                 continue
             candidate = scorer.score(candidate)
-            source_id = _save_source(conn, source)
-            _save_topic(conn, candidate, source_id)
             if candidate.status == "approved":
+                source_id = _save_source(conn, source)
+                _save_topic(conn, candidate, source_id)
                 approved.append(candidate)
         except Exception as exc:
             print(f"  Warning: skipped {source.url}: {exc}", file=sys.stderr)
