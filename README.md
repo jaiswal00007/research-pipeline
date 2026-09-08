@@ -2,7 +2,7 @@
 
 A fully local, zero-cost pipeline that researches AI tools daily, scores them, generates social media content, and posts automatically — with a human approval step in between.
 
-Built by [Anshu](https://github.com/yourusername) · Follow [@devtoolsai](https://instagram.com/devtoolsai)
+Built by [Anshu](https://github.com/jaiswal00007) · Follow me.
 
 ---
 
@@ -43,7 +43,7 @@ ollama pull qwen3:8b
 ## Setup
 
 ```bash
-git clone https://github.com/yourusername/devtoolsai
+git clone https://github.com/jaiswal00007/research-pipeline
 cd devtoolsai
 uv sync
 cp .env.example .env
