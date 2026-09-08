@@ -23,7 +23,10 @@ def test_run_pipeline_saves_approved_topics(db):
         RawSource(url="https://github.com/a/b", title="a/b", source_type="github",
                   fetched_at="2026-09-07T00:00:00", raw={})
     ]), patch("pipeline.runner.fetch_hn_ai_stories", return_value=[]), \
-       patch("pipeline.runner.fetch_reddit_ai_posts", return_value=[]), \
+       patch("pipeline.runner.fetch_rss_feeds", return_value=[]), \
+       patch("pipeline.runner.fetch_brave_search", return_value=[]), \
+       patch("pipeline.runner.fetch_arxiv_papers", return_value=[]), \
+       patch("pipeline.runner.fetch_producthunt_launches", return_value=[]), \
        patch("pipeline.runner.ResearchAgent") as MockResearcher, \
        patch("pipeline.runner.ValidationAgent") as MockValidator, \
        patch("pipeline.runner.TopicScorer") as MockScorer:
