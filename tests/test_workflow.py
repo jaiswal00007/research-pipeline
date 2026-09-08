@@ -89,3 +89,26 @@ def test_post_approved_posts_approved_carousel(db, monkeypatch):
         result = post_approved(db_conn=db)
 
     assert result == ["media123"]
+
+
+def test_post_approved_dry_run_does_not_call_poster(db, monkeypatch):
+    db.execute(
+        "INSERT INTO topics (title, summary, status, created_at) VALUES (?, ?, ?, ?)",
+        ("Test Topic", "A summary", "approved", "2026-01-01T00:00:00"),
+    )
+    db.execute(
+        "INSERT INTO posts (topic_id, format, hook, content_json, status, created_at) "
+        "VALUES (1, 'carousel', 'hook', '{}', 'approved', '2026-01-01T00:00:00')"
+    )
+    db.commit()
+
+    monkeypatch.setenv("INSTAGRAM_ACCESS_TOKEN", "test_token")
+    monkeypatch.setenv("INSTAGRAM_ACCOUNT_ID", "test_account")
+
+    with patch(
+        "pipeline.content.poster.InstagramPoster.post_carousel",
+    ) as mock_post:
+        result = post_approved(db_conn=db, dry_run=True)
+
+    mock_post.assert_not_called()
+    assert "dry-run:1" in result

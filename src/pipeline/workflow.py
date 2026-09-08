@@ -38,7 +38,7 @@ def generate_content(db_conn=None, llm=None) -> list[dict]:
     return results
 
 
-def post_approved(db_conn=None) -> list[str]:
+def post_approved(db_conn=None, dry_run: bool = False) -> list[str]:
     """Post all approved carousel posts to Instagram."""
     conn = db_conn or get_db()
 
@@ -55,20 +55,34 @@ def post_approved(db_conn=None) -> list[str]:
 
     media_ids: list[str] = []
     for row in rows:
-        try:
-            poster = InstagramPoster(access_token=access_token, account_id=account_id)
-            media_id = poster.post_carousel(
-                post_id=row["id"],
-                image_urls=[],
-                caption=row["hook"] or "",
-                conn=conn,
-            )
-            media_ids.append(media_id)
-        except Exception as exc:
-            print(f"Warning: failed to post post_id={row['id']}: {exc}")
+        if dry_run:
+            print(f'[DRY RUN] Would post to Instagram: post_id={row["id"]} caption="{row["hook"] or ""}"')
+            media_ids.append(f"dry-run:{row['id']}")
+        else:
+            try:
+                poster = InstagramPoster(access_token=access_token, account_id=account_id)
+                media_id = poster.post_carousel(
+                    post_id=row["id"],
+                    image_urls=[],
+                    caption=row["hook"] or "",
+                    conn=conn,
+                )
+                media_ids.append(media_id)
+            except Exception as exc:
+                print(f"Warning: failed to post post_id={row['id']}: {exc}")
 
-    print(f"Posted {len(media_ids)} posts to Instagram.")
+    if dry_run:
+        print(f"[DRY RUN] {len(media_ids)} posts would be sent.")
+    else:
+        print(f"Posted {len(media_ids)} posts to Instagram.")
     return media_ids
+
+
+def post_main() -> None:
+    import sys
+    load_dotenv()
+    dry_run = "--dry-run" in sys.argv
+    post_approved(dry_run=dry_run)
 
 
 def main() -> None:
