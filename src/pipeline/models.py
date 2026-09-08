@@ -4,7 +4,7 @@ from pydantic import BaseModel, computed_field
 from datetime import datetime, timezone
 
 
-SourceType = Literal["github", "hackernews", "reddit", "rss"]
+SourceType = Literal["github", "hackernews", "reddit", "rss", "web"]
 
 
 class RawSource(BaseModel):
