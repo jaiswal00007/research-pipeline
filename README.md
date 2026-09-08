@@ -1,4 +1,4 @@
-# devtoolsai — AI Social Media Pipeline
+# RESEATCH_PIPELINE — AI Social Media Pipeline
 
 A fully local, zero-cost pipeline that researches AI tools daily, scores them, generates social media content, and posts automatically — with a human approval step in between.
 
