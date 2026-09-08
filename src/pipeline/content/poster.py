@@ -3,9 +3,8 @@ from __future__ import annotations
 import os
 import sqlite3
 
-import httpx
-
 from pipeline.db import get_db
+from pipeline.http import http_post
 from pipeline.models import now_iso
 
 
@@ -32,44 +31,40 @@ class InstagramPoster:
         if conn is None:
             conn = get_db()
 
-        with httpx.Client() as client:
-            # Step 1: Create a media container for each image
-            item_ids: list[str] = []
-            for image_url in image_urls:
-                resp = client.post(
-                    f"{self.BASE_URL}/{self._account_id}/media",
-                    params={
-                        "image_url": image_url,
-                        "is_carousel_item": "true",
-                        "access_token": self._token,
-                    },
-                )
-                resp.raise_for_status()
-                item_ids.append(resp.json()["id"])
-
-            # Step 2: Create the carousel container
-            resp = client.post(
+        # Step 1: Create a media container for each image
+        item_ids: list[str] = []
+        for image_url in image_urls:
+            resp = http_post(
                 f"{self.BASE_URL}/{self._account_id}/media",
                 params={
-                    "media_type": "CAROUSEL",
-                    "children": ",".join(item_ids),
-                    "caption": caption,
+                    "image_url": image_url,
+                    "is_carousel_item": "true",
                     "access_token": self._token,
                 },
             )
-            resp.raise_for_status()
-            carousel_id = resp.json()["id"]
+            item_ids.append(resp.json()["id"])
 
-            # Step 3: Publish
-            resp = client.post(
-                f"{self.BASE_URL}/{self._account_id}/media_publish",
-                params={
-                    "creation_id": carousel_id,
-                    "access_token": self._token,
-                },
-            )
-            resp.raise_for_status()
-            media_id = resp.json()["id"]
+        # Step 2: Create the carousel container
+        resp = http_post(
+            f"{self.BASE_URL}/{self._account_id}/media",
+            params={
+                "media_type": "CAROUSEL",
+                "children": ",".join(item_ids),
+                "caption": caption,
+                "access_token": self._token,
+            },
+        )
+        carousel_id = resp.json()["id"]
+
+        # Step 3: Publish
+        resp = http_post(
+            f"{self.BASE_URL}/{self._account_id}/media_publish",
+            params={
+                "creation_id": carousel_id,
+                "access_token": self._token,
+            },
+        )
+        media_id = resp.json()["id"]
 
         # Step 4: Update the posts table
         now = now_iso()
@@ -106,19 +101,17 @@ class YouTubePoster:
         conn: sqlite3.Connection | None = None,
     ) -> str:
         """Post a YouTube Community post. Returns the YouTube post_id string."""
-        with httpx.Client() as client:
-            resp = client.post(
-                f"{self.BASE_URL}/communityPosts",
-                params={"key": self._api_key},
-                json={
-                    "snippet": {
-                        "type": "textPost",
-                        "textOriginalContent": f"{title}\n\n{summary}",
-                    }
-                },
-            )
-            resp.raise_for_status()
-            yt_post_id = resp.json()["id"]
+        resp = http_post(
+            f"{self.BASE_URL}/communityPosts",
+            params={"key": self._api_key},
+            json={
+                "snippet": {
+                    "type": "textPost",
+                    "textOriginalContent": f"{title}\n\n{summary}",
+                }
+            },
+        )
+        yt_post_id = resp.json()["id"]
 
         if post_id is not None:
             if conn is None:

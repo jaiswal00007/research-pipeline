@@ -1,5 +1,5 @@
 import os
-import httpx
+from pipeline.http import http_get
 from pipeline.models import RawSource, now_iso
 
 _DEFAULT_SUBS = ["MachineLearning", "LocalLLaMA", "artificial", "singularity", "Programming"]
@@ -20,8 +20,7 @@ def fetch_reddit_ai_posts(
     for sub in subs:
         url = f"https://www.reddit.com/r/{sub}/hot.json"
         headers = {"User-Agent": _user_agent()}
-        resp = httpx.get(url, params={"limit": limit}, headers=headers, timeout=15)
-        resp.raise_for_status()
+        resp = http_get(url, params={"limit": limit}, headers=headers, timeout=15)
         children = resp.json().get("data", {}).get("children", [])
         for child in children:
             post = child["data"]

@@ -1,5 +1,5 @@
 import os
-import httpx
+from pipeline.http import http_get
 from pipeline.models import RawSource, now_iso
 
 _BASE = "https://api.github.com"
@@ -21,8 +21,7 @@ def _headers(token: str | None) -> dict[str, str]:
 
 def search_github_ai(query: str, token: str | None = None) -> list[RawSource]:
     params = {"q": f"{query} language:Python stars:>50", "sort": "stars", "per_page": 10}
-    resp = httpx.get(f"{_BASE}/search/repositories", params=params, headers=_headers(token), timeout=15)
-    resp.raise_for_status()
+    resp = http_get(f"{_BASE}/search/repositories", params=params, headers=_headers(token), timeout=15)
     items = resp.json().get("items", [])
     return [
         RawSource(

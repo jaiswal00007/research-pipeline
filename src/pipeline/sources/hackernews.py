@@ -1,4 +1,4 @@
-import httpx
+from pipeline.http import http_get
 from pipeline.models import RawSource, now_iso
 
 _ALGOLIA = "https://hn.algolia.com/api/v1/search"
@@ -13,8 +13,7 @@ def fetch_hn_ai_stories(min_points: int = 100) -> list[RawSource]:
         "hitsPerPage": 30,
         "numericFilters": f"points>{min_points}",
     }
-    resp = httpx.get(_ALGOLIA, params=params, timeout=15)
-    resp.raise_for_status()
+    resp = http_get(_ALGOLIA, params=params, timeout=15)
     hits = resp.json().get("hits", [])
     results = []
     for hit in hits:
