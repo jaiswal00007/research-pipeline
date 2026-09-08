@@ -10,6 +10,9 @@ dependencies = [
 
 [project.scripts]
 pipeline = "pipeline.runner:main"
+approve = "pipeline.cli.approve:main"
+workflow = "pipeline.workflow:main"
+post = "pipeline.workflow:post_approved"
 
 [build-system]
 requires = ["hatchling"]
