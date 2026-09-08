@@ -4,10 +4,10 @@ from pipeline.http import http_get
 from pipeline.models import RawSource, now_iso
 
 _FEEDS = [
-    ("OpenAI Blog", "https://openai.com/blog/rss.xml"),
-    ("Anthropic News", "https://www.anthropic.com/rss.xml"),
+    ("OpenAI News", "https://openai.com/news/rss.xml"),
+    ("Anthropic News", "https://www.anthropic.com/feed.rss"),
     ("Google DeepMind Blog", "https://deepmind.google/blog/rss.xml"),
-    ("Mistral AI Blog", "https://mistral.ai/feed.xml"),
+    ("Mistral AI Blog", "https://mistral.ai/news/rss"),
     ("Hugging Face Blog", "https://huggingface.co/blog/feed.xml"),
 ]
 

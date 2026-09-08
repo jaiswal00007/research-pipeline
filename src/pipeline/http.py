@@ -10,7 +10,7 @@ def http_get(url: str, *, params=None, headers=None, timeout: int = 30) -> httpx
     last_exc: Exception | None = None
     for attempt in range(_MAX_ATTEMPTS):
         try:
-            resp = httpx.get(url, params=params, headers=headers, timeout=timeout)
+            resp = httpx.get(url, params=params, headers=headers, timeout=timeout, follow_redirects=True)
             resp.raise_for_status()
             return resp
         except httpx.HTTPStatusError as exc:

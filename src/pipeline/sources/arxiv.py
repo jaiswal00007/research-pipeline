@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 from pipeline.http import http_get
 from pipeline.models import RawSource, now_iso
 
-_ARXIV_API = "http://export.arxiv.org/api/query"
+_ARXIV_API = "https://export.arxiv.org/api/query"
 _NS = {"atom": "http://www.w3.org/2005/Atom"}
 
 _SEARCHES = [

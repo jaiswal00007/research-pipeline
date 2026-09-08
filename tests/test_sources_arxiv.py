@@ -5,7 +5,7 @@ from pytest_httpx import HTTPXMock
 
 from pipeline.sources.arxiv import fetch_arxiv_papers, _SEARCHES
 
-_ARXIV_URL_PATTERN = re.compile(r"http://export\.arxiv\.org/api/query.*")
+_ARXIV_URL_PATTERN = re.compile(r"https://export\.arxiv\.org/api/query.*")
 
 SAMPLE_ATOM = """\
 <?xml version="1.0" encoding="UTF-8"?>
