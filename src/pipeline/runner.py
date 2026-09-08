@@ -11,9 +11,13 @@ from pipeline.agents.researcher import ResearchAgent
 from pipeline.agents.validator import ValidationAgent
 from pipeline.models import RawSource, TopicCandidate, now_iso
 from pipeline.scorer import TopicScorer
+from pipeline.sources.arxiv import fetch_arxiv_papers
+from pipeline.sources.brave import fetch_brave_search
 from pipeline.sources.github import fetch_github_trending
 from pipeline.sources.hackernews import fetch_hn_ai_stories
+from pipeline.sources.producthunt import fetch_producthunt_launches
 from pipeline.sources.reddit import fetch_reddit_ai_posts
+from pipeline.sources.rss import fetch_rss_feeds
 
 
 def _save_source(conn: sqlite3.Connection, source: RawSource) -> int:
@@ -78,6 +82,10 @@ def run_pipeline(
     sources.extend(fetch_github_trending())
     sources.extend(fetch_hn_ai_stories())
     sources.extend(fetch_reddit_ai_posts())
+    sources.extend(fetch_rss_feeds())
+    sources.extend(fetch_brave_search())
+    sources.extend(fetch_arxiv_papers())
+    sources.extend(fetch_producthunt_launches())
     print(f"  Found {len(sources)} raw sources")
 
     approved: list[TopicCandidate] = []
