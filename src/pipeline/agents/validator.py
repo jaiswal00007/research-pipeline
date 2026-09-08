@@ -31,11 +31,11 @@ class ValidationAgent:
         )
         response = self.llm.chat(prompt, system=_VERIFY_SYSTEM)
         verdict_match = re.search(r"VERDICT:\s*(APPROVED|REJECTED)", response, re.IGNORECASE)
+        update: dict = {"verification_notes": response[:1000]}
         if verdict_match:
             verdict = verdict_match.group(1).upper()
-            candidate = candidate.model_copy(
-                update={"status": "approved" if verdict == "APPROVED" else "rejected"}
-            )
+            update["status"] = "approved" if verdict == "APPROVED" else "rejected"
+        candidate = candidate.model_copy(update=update)
         return candidate
 
     def score_repo(self, repo: RepoInfo) -> RepoInfo:

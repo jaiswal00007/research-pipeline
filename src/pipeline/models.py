@@ -38,6 +38,7 @@ class TopicCandidate(BaseModel):
     source: RawSource
     score: TopicScore | None = None
     status: Literal["pending", "approved", "rejected"] = "pending"
+    verification_notes: str | None = None
 
 
 class Claim(BaseModel):

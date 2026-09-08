@@ -1,6 +1,8 @@
 import json
 import sqlite3
 
+from dotenv import load_dotenv
+
 from pipeline.db import get_db
 
 
@@ -16,6 +18,12 @@ class ApprovalCLI:
                 p.topic_id,
                 t.title  AS topic_title,
                 t.score_total,
+                t.score_usefulness,
+                t.score_novelty,
+                t.score_dev_value,
+                t.score_search_demand,
+                t.score_monetization,
+                t.score_ease_demo,
                 p.hook,
                 p.content_json,
                 p.format,
@@ -44,11 +52,7 @@ class ApprovalCLI:
 
 
 def main() -> None:
-    try:
-        from dotenv import load_dotenv
-        load_dotenv()
-    except ImportError:
-        pass
+    load_dotenv()
 
     cli = ApprovalCLI()
     posts = cli.get_pending_posts()
@@ -62,6 +66,16 @@ def main() -> None:
         topic_title = post["topic_title"]
         score_total = post["score_total"] or 0.0
         print(f"\n=== Post {i}/{total}: {topic_title} (score: {score_total:.0f}) ===")
+        print(
+            f"Scores: "
+            f"usefulness={post['score_usefulness'] or 0:.0f} "
+            f"novelty={post['score_novelty'] or 0:.0f} "
+            f"dev_value={post['score_dev_value'] or 0:.0f} "
+            f"search_demand={post['score_search_demand'] or 0:.0f} "
+            f"monetization={post['score_monetization'] or 0:.0f} "
+            f"ease_demo={post['score_ease_demo'] or 0:.0f} "
+            f"| total={score_total:.0f}"
+        )
 
         try:
             content = json.loads(post["content_json"])

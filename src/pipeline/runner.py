@@ -28,9 +28,9 @@ def _save_source(conn: sqlite3.Connection, source: RawSource) -> int:
     return row["id"]
 
 
-def _save_topic(conn: sqlite3.Connection, candidate: TopicCandidate, source_id: int) -> None:
+def _save_topic(conn: sqlite3.Connection, candidate: TopicCandidate, source_id: int) -> int:
     s = candidate.score
-    conn.execute(
+    cur = conn.execute(
         """INSERT INTO topics
            (title, summary, source_id, score_total, score_usefulness, score_novelty,
             score_dev_value, score_search_demand, score_monetization, score_ease_demo,
@@ -45,7 +45,21 @@ def _save_topic(conn: sqlite3.Connection, candidate: TopicCandidate, source_id: 
             candidate.status, now_iso(),
         ),
     )
+    topic_id = cur.lastrowid
+    if candidate.verification_notes is not None:
+        conn.execute(
+            """INSERT INTO claims (topic_id, claim_text, is_verified, verification_notes, verified_at)
+               VALUES (?, ?, ?, ?, ?)""",
+            (
+                topic_id,
+                candidate.title,
+                1 if candidate.status == "approved" else 0,
+                candidate.verification_notes,
+                now_iso(),
+            ),
+        )
     conn.commit()
+    return topic_id
 
 
 def run_pipeline(
