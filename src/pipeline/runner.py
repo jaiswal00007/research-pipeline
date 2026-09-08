@@ -16,7 +16,6 @@ from pipeline.sources.brave import fetch_brave_search
 from pipeline.sources.github import fetch_github_trending
 from pipeline.sources.hackernews import fetch_hn_ai_stories
 from pipeline.sources.producthunt import fetch_producthunt_launches
-from pipeline.sources.reddit import fetch_reddit_ai_posts
 from pipeline.sources.rss import fetch_rss_feeds
 
 
@@ -81,7 +80,6 @@ def run_pipeline(
     sources: list[RawSource] = []
     sources.extend(fetch_github_trending())
     sources.extend(fetch_hn_ai_stories())
-    sources.extend(fetch_reddit_ai_posts())
     sources.extend(fetch_rss_feeds())
     sources.extend(fetch_brave_search())
     sources.extend(fetch_arxiv_papers())
